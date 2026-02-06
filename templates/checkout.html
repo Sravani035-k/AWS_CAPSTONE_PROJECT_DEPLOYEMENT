@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Information</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sweet Bakery</div>
+</nav>
+
+<div class="checkout-container">
+
+    <!-- LEFT : DELIVERY FORM -->
+    <div class="delivery-form">
+        <h2>Delivery Information</h2>
+
+        <form action="/payment" method="post">
+            <div class="row">
+                <input type="text" name="fname" placeholder="First Name" required>
+                <input type="text" name="lname" placeholder="Last Name" required>
+            </div>
+
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="text" name="street" placeholder="Street" required>
+
+            <div class="row">
+                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="state" placeholder="State" required>
+            </div>
+
+            <div class="row">
+                <input type="text" name="zip" placeholder="Zip Code" required>
+                <input type="text" name="country" placeholder="Country" required>
+            </div>
+
+            <input type="text" name="phone" placeholder="Phone Number" required>
+    </div>
+
+    <!-- RIGHT : CART TOTALS -->
+    <div class="cart-summary">
+        <h3>Cart Totals</h3>
+
+        <div class="summary-row">
+            <span>SubTotal</span>
+            <span>₹{{ item_total }}</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Delivery Fees</span>
+            <span>₹{{ delivery_fee }}</span>
+        </div>
+
+        <div class="summary-row total">
+            <span>Total</span>
+            <span>₹{{ total }}</span>
+        </div>
+
+        <button type="submit" class="payment-btn">Proceed to Payment</button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

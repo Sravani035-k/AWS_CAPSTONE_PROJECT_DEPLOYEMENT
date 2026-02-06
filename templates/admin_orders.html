@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Orders | Sweet Bakery</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Admin Panel - Orders</div>
+    <div>
+        <a href="/">Home</a>
+    </div>
+</nav>
+
+<section class="section">
+    <h2>All Customer Orders</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+
+            <h3>Order {{ loop.index }}</h3>
+
+            <!-- Delivery Information -->
+            <div class="delivery-info">
+                <p><b>Customer Name:</b> {{ order['delivery']['fname'] }} {{ order['delivery']['lname'] }}</p>
+                <p><b>Email:</b> {{ order['delivery']['email'] }}</p>
+                <p><b>Phone:</b> {{ order['delivery']['phone'] }}</p>
+                <p><b>Address:</b>
+                    {{ order['delivery']['street'] }},
+                    {{ order['delivery']['city'] }},
+                    {{ order['delivery']['state'] }},
+                    {{ order['delivery']['zip'] }},
+                    {{ order['delivery']['country'] }}
+                </p>
+            </div>
+
+            <!-- Ordered Items -->
+            <table class="order-table">
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                </tr>
+
+                {% for item in order['items'] %}
+                <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>₹{{ item['price'] }}</td>
+                </tr>
+                {% endfor %}
+
+                <tr class="total-row">
+                    <td><b>Total Amount</b></td>
+                    <td><b>₹{{ order['total'] }}</b></td>
+                </tr>
+            </table>
+
+        </div>
+        <hr>
+        {% endfor %}
+    {% else %}
+        <p>No orders placed yet.</p>
+    {% endif %}
+</section>
+
+</body>
+</html>

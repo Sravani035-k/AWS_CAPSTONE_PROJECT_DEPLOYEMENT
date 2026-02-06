@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Item</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: Arial; background: #f8f8f8; padding: 50px; }
+        .form-box {
+            background: #fff;
+            padding: 20px;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-box input, .form-box button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-box button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-box button:hover {
+            background: #e65c00;
+        }
+        img { width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<h2>Edit Item</h2>
+<div class="form-box">
+    <form method="post" enctype="multipart/form-data">
+        <input type="text" name="name" value="{{ item[1] }}" placeholder="Item Name" required>
+        <input type="number" name="price" value="{{ item[2] }}" placeholder="Price" required>
+        <p>Current Image:</p>
+        <img src="{{ url_for('static', filename='images/' ~ item[3]) }}">
+        <label>Upload New Image (optional)</label>
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">Update Item</button>
+    </form>
+</div>
+
+</body>
+</html>

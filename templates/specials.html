@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu | Artisan Bakery</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Artisan Bakery - Menu</div>
+    <div class="nav-links">
+        <a href="/cart">Cart</a>
+        <a href="/orders">Orders</a>
+        <a href="/">Home</a>
+    </div>
+</nav>
+
+<section class="section">
+    <h2>Today's Specials</h2>
+
+    <div class="card-container">
+        {% for item in items %}
+        <div class="card">
+            <img src="/static/images/{{ item.image }}">
+            <h3>{{ item.name }}</h3>
+            <p>₹{{ item.price }}</p>
+
+            {% set found = namespace(qty=0) %}
+{% for c in cart %}
+    {% if c.id == item.id %}
+        {% set found.qty = c.qty %}
+    {% endif %}
+{% endfor %}
+
+{% if found.qty == 0 %}
+    <form action="/add_to_cart/{{ item.id }}" method="post">
+        <button class="btn">Add to Cart</button>
+    </form>
+{% else %}
+    <div style="display:flex; justify-content:center; gap:15px; align-items:center;">
+        <a href="/dec/{{ item.id }}" class="btn">➖</a>
+        <b style="font-size:18px;">{{ found.qty }}</b>
+        <a href="/inc/{{ item.id }}" class="btn">➕</a>
+    </div>
+{% endif %}
+
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+</body>
+</html>

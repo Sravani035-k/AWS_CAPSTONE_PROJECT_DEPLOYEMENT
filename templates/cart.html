@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav>
+    <h2>🥖 Artisan Bakery</h2>
+    <div>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('cart') }}">🛒 Cart ({{ items|length }})</a>
+    </div>
+</nav>
+
+<h2 class="title">Your Cart Items</h2>
+
+{% if items %}
+<table>
+<tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Price</th>
+    <th>Remove</th>
+</tr>
+{% for i in items %}
+<tr>
+    <td><img src="/static/images/{{ i['image'] }}" width="70"></td>
+    <td>{{ i['name'] }}</td>
+    <td>₹{{ i['price'] * i['qty'] }}</td>
+
+    <td>
+    <a href="/dec/{{ i['id'] }}">➖</a>
+    {{ i['qty'] }}
+    <a href="/inc/{{ i['id'] }}">➕</a>
+</td>
+
+</tr>
+{% endfor %}
+</table>
+<div class="cart-total-box">
+    <h2>Cart Totals</h2>
+
+    <div class="total-row">
+        <span>Item Cost</span>
+        <span>₹{{ item_total }}</span>
+    </div>
+
+    <div class="total-row">
+        <span>Delivery Fee</span>
+        <span>₹{{ delivery_fee }}</span>
+    </div>
+
+    <div class="total-row grand-total">
+        <span>Total</span>
+        <span>₹{{ total }}</span>
+    </div>
+
+    <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
+</div>
+
+
+
+
+{% else %}
+<p style="text-align:center; font-size:18px;">Your cart is empty!</p>
+{% endif %}
+
+</body>
+</html>

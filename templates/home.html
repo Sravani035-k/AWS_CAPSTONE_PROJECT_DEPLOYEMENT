@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Artisan Bakery</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    scroll-behavior:smooth;
+}
+
+/* NAVBAR GLASS EFFECT */
+.navbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 60px;
+    backdrop-filter: blur(12px);
+    background:rgba(0,0,0,0.45);
+    color:white;
+    z-index:1000;
+}
+
+.navbar a{
+    color:white;
+    text-decoration:none;
+    margin-left:30px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.navbar a:hover{
+    color:#1abc9c;
+}
+
+/* HERO */
+.hero{
+    height:100vh;
+    background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+               url("/static/images/bakery-bg.png") center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:white;
+    padding:0 20px;
+}
+
+.hero-text h1{
+    font-size:55px;
+    animation:fadeUp 1.5s ease;
+}
+
+.hero-text p{
+    font-size:22px;
+    margin-top:15px;
+    animation:fadeUp 2s ease;
+}
+
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(40px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* SECTIONS */
+.section{
+    padding:100px 80px;
+    text-align:center;
+}
+
+.section:nth-child(even){
+    background:#faf7f2;
+}
+
+.section h2{
+    font-size:36px;
+    margin-bottom:50px;
+}
+
+/* CARDS */
+.card-container{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:35px;
+}
+
+.card{
+    width:260px;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    transition:0.4s;
+}
+
+.card:hover{
+    transform:translateY(-12px) scale(1.03);
+    box-shadow:0 18px 35px rgba(0,0,0,0.25);
+}
+
+.card img{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+}
+
+.card h3{
+    margin:15px 0 5px;
+}
+
+.card p{
+    color:#555;
+    margin-bottom:15px;
+}
+
+/* BUTTON */
+.btn{
+    display:inline-block;
+    padding:10px 18px;
+    margin-bottom:18px;
+    border:none;
+    background:#1abc9c;
+    color:white;
+    border-radius:25px;
+    cursor:pointer;
+    transition:0.3s;
+    font-weight:600;
+}
+
+.btn:hover{
+    background:#16a085;
+    transform:scale(1.05);
+}
+
+/* WAVE DIVIDER */
+.wave{
+    position:relative;
+    top:-5px;
+}
+
+/* FOOTER */
+footer{
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:30px;
+    font-size:15px;
+    letter-spacing:1px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+    <div class="logo">Artisan Bakery</div>
+
+    <div class="nav-links">
+        <a href="#menu">Menu</a>
+        <a href="/login">Login</a>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<header class="hero">
+    <div class="hero-text">
+        <h1>Order your favorite cake here and make every moment special!</h1>
+        <p>Freshly baked delights made with love. Discover treats you'll adore.</p>
+    </div>
+</header>
+
+<!-- EXPLORE MENU (NO ADD TO CART) -->
+<section id="menu" class="section">
+    <h2>Explore Our Menu</h2>
+    <div class="card-container">
+
+        <div class="card">
+            <img src="/static/images/bread.jpg">
+            <h3>Fresh Bread</h3>
+            <p>₹60</p>
+        </div>
+
+        <div class="card">
+            <img src="/static/images/chocolate_cake.jpg">
+            <h3>Chocolate Cake</h3>
+            <p>₹250</p>
+        </div>
+
+        <div class="card">
+            <img src="/static/images/Cup_cake.jpg">
+            <h3>Cup Cake</h3>
+            <p>₹120</p>
+        </div>
+
+        <div class="card">
+            <img src="/static/images/croissant.jpg">
+            <h3>Croissant</h3>
+            <p>₹80</p>
+        </div>
+
+    </div>
+</section>
+
+
+
+<footer>
+    © 2026 Artisan Bakery | Fresh Taste, Sweet Moments
+</footer>
+
+</body>
+</html>

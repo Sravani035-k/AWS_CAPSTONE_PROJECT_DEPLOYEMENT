@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Orders</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Your Orders</div>
+    <div>
+        <a href="/">Home</a>
+    </div>
+</nav>
+
+<section class="section">
+    <h2>Your Order Details</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+
+            <h3>Order {{ loop.index }}</h3>
+
+            <div class="delivery-info">
+                <p><b>Name:</b>
+                    {{ order['delivery']['fname'] }}
+                    {{ order['delivery']['lname'] }}
+                </p>
+
+                <p><b>Address:</b>
+                    {{ order['delivery']['street'] }},
+                    {{ order['delivery']['city'] }},
+                    {{ order['delivery']['state'] }},
+                    {{ order['delivery']['zip'] }},
+                    {{ order['delivery']['country'] }}
+                </p>
+
+                <p><b>Phone:</b>
+                    {{ order['delivery']['phone'] }}
+                </p>
+            </div>
+
+            <table class="order-table">
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                </tr>
+
+                {% for item in order['items'] %}
+                <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>₹{{ item['price'] }}</td>
+                </tr>
+                {% endfor %}
+
+                <tr class="total-row">
+                    <td><b>Total Amount</b></td>
+                    <td><b>₹{{ order['total'] }}</b></td>
+                </tr>
+            </table>
+
+        </div>
+        <hr>
+        {% endfor %}
+    {% else %}
+        <p style="text-align:center;">No orders placed yet.</p>
+    {% endif %}
+
+</section>
+
+</body>
+</html>

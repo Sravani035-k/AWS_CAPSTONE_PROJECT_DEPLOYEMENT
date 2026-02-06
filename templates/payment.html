@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">Sweet Bakery</div>
+</nav>
+
+<section class="section">
+    <h2>Select Payment Method</h2>
+
+    <form action="/place_order" method="post" style="max-width:500px;margin:auto;">
+        <input type="radio" name="payment" value="UPI" checked> UPI Payment<br><br>
+        <input type="radio" name="payment" value="COD"> Cash On Delivery<br><br>
+
+        <h3>Total Amount: ₹{{ total }}</h3><br>
+
+        <button type="submit" class="btn">Pay Now</button>
+    </form>
+</section>
+
+</body>
+</html>

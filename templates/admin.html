@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar {
+            width: 200px;
+            background: #333;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 20px;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            margin: 5px 0;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #ff6600;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        .form-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-box input, .form-box button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-box button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-box button:hover {
+            background: #e65c00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #f4f4f4;
+        }
+        img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        a.action-btn {
+            padding: 4px 8px;
+            background: #ff6600;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+        a.action-btn:hover {
+            background: #e65c00;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="#" class="tab-link active" data-tab="add-item">Add Item</a>
+    <a href="#" class="tab-link" data-tab="item-list">Item List</a>
+    <a href="#" class="tab-link" data-tab="orders">Orders</a>
+</div>
+
+<div class="main-content">
+    <!-- ADD ITEM TAB -->
+    <div id="add-item" class="tab-content">
+        <h2>Add Bakery Item</h2>
+        <div class="form-box">
+            <form method="post" enctype="multipart/form-data">
+                <input name="name" placeholder="Item Name" required>
+                <input type="number" name="price" placeholder="Price" required>
+                <label>Upload Image</label>
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit">Add Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ITEM LIST TAB -->
+    <div id="item-list" class="tab-content" style="display:none;">
+        <h2>Item List</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+            {% for item in items %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td>₹{{ item[2] }}</td>
+                <td><img src="{{ url_for('static', filename='images/' ~ item[3]) }}"></td>
+                <td>
+                    <a href="{{ url_for('edit_item', item_id=item[0]) }}" class="action-btn">Edit</a>
+                    <a href="{{ url_for('delete_item', item_id=item[0]) }}" class="action-btn" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <!-- ORDERS TAB -->
+<div id="orders" class="tab-content" style="display:none;">
+    <h2>All Orders</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+        <h3>Order #{{ loop.index }} | Expected Delivery: {{ order.expected_date }}</h3>
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+            {% for i in order.order_items %}
+            <tr>
+                <td>{{ i.name }}</td>
+                <td>{{ i.qty }}</td>
+                <td>₹{{ i.price }}</td>
+                <td>₹{{ i.price * i.qty }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3"><strong>Delivery Fee</strong></td>
+                <td>₹50</td>
+            </tr>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td>₹{{ order.total }}</td>
+            </tr>
+        </table>
+        <br>
+        {% endfor %}
+    {% else %}
+        <p>No orders yet.</p>
+    {% endif %}
+</div>
+
+
+</div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-link');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const target = tab.getAttribute('data-tab');
+            contents.forEach(c => c.style.display = 'none');
+            document.getElementById(target).style.display = 'block';
+        });
+    });
+</script>
+
+</body>
+</html>

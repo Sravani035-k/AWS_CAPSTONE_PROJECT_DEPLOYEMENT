@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Item</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="form-box">
+<h2>Add Bakery Item</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <input name="name" placeholder="Item Name" required>
+    <input name="price" placeholder="Price" required>
+
+    <!-- IMAGE UPLOAD -->
+    <label>Upload Image</label>
+    <input type="file" name="image" accept="image/*" required>
+
+    <button class="btn">Add Item</button>
+</form>
+
+</div>
+
+</body>
+</html>
