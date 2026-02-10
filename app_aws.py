@@ -1,92 +1,170 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import boto3
 import uuid
-from datetime import datetime
+from werkzeug.utils import secure_filename
+from botocore.exceptions import ClientError
 
-app = Flask(__name__)
-app.secret_key = "bakery_secret_key"
+app = Flask(_name_)
+app.secret_key = "artisan_secret_key"
 
-# ---------- AWS CLIENTS ----------
-region = "ap-south-1"   # Mumbai region
+# ---------------- AWS CONFIGURATION ----------------
+REGION = "ap-south-1"
+BUCKET_NAME = "artisan-bakery-images"
 
-dynamodb = boto3.resource("dynamodb", region_name=region)
-sns = boto3.client("sns", region_name=region)
+dynamodb = boto3.resource("dynamodb", region_name=REGION)
+s3 = boto3.client("s3", region_name=REGION)
+sns = boto3.client("sns", region_name=REGION)
 
-PRODUCTS_TABLE = dynamodb.Table("BakeryProducts")
-ORDERS_TABLE = dynamodb.Table("BakeryOrders")
+# ---------------- DYNAMODB TABLES ----------------
+users_table = dynamodb.Table("Users")
+items_table = dynamodb.Table("BakeryItems")
+orders_table = dynamodb.Table("Orders")
 
-SNS_TOPIC_ARN = "arn:aws:sns:ap-south-1:123456789012:BakeryOrders"
+# ---------------- SNS TOPIC ARN ----------------
+SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:490004646397:aws_capstone"
 
-# ---------- HOME ----------
+
+# ---------------- HOME ----------------
 @app.route("/")
 def home():
-    response = PRODUCTS_TABLE.scan()
+    return redirect(url_for("login"))
+
+
+# ---------------- REGISTER ----------------
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        users_table.put_item(Item={
+            "user_id": str(uuid.uuid4()),
+            "username": username,
+            "password": password
+        })
+
+        flash("Registered Successfully!")
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
+
+# ---------------- LOGIN ----------------
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        response = users_table.scan()
+        users = response.get("Items", [])
+
+        for user in users:
+            if user["username"] == username and user["password"] == password:
+                session["user"] = username
+                return redirect(url_for("specials"))
+
+        flash("Invalid Credentials")
+
+    return render_template("login.html")
+
+
+# ---------------- SHOW ITEMS ----------------
+@app.route("/specials")
+def specials():
+    response = items_table.scan()
     items = response.get("Items", [])
-    return render_template("index.html", items=items)
+    return render_template("specials.html", items=items, cart=session.get("cart", []))
 
-# ---------- ADD TO CART ----------
-@app.route("/add_to_cart/<product_id>")
-def add_to_cart(product_id):
-    if "cart" not in session:
-        session["cart"] = []
 
-    session["cart"].append(product_id)
-    session.modified = True
-    return redirect(url_for("cart"))
+# ---------------- ADMIN ADD ITEM ----------------
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        name = request.form["name"]
+        price = int(request.form["price"])
+        image = request.files["image"]
 
-# ---------- VIEW CART ----------
-@app.route("/cart")
-def cart():
-    cart_items = []
-    total = 0
+        filename = secure_filename(image.filename)
+        s3.upload_fileobj(
+            image,
+            BUCKET_NAME,
+            filename,
+            ExtraArgs={"ContentType": image.content_type}
+        )
 
-    if "cart" in session:
-        for pid in session["cart"]:
-            response = PRODUCTS_TABLE.get_item(Key={"product_id": pid})
-            item = response.get("Item")
-            if item:
-                cart_items.append(item)
-                total += int(item["price"])
+        image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
-    return render_template("cart.html", items=cart_items, total=total)
+        items_table.put_item(Item={
+            "item_id": str(uuid.uuid4()),
+            "name": name,
+            "price": price,
+            "image": image_url
+        })
 
-# ---------- PLACE ORDER ----------
-@app.route("/place_order", methods=["POST"])
+        flash("Item Added Successfully!")
+        return redirect(url_for("admin"))
+
+    response = items_table.scan()
+    items = response.get("Items", [])
+    return render_template("admin.html", items=items)
+
+
+# ---------------- ADD TO CART ----------------
+@app.route("/add_to_cart/<item_id>", methods=["POST"])
+def add_to_cart(item_id):
+    cart = session.get("cart", [])
+
+    found = False
+    for c in cart:
+        if c["id"] == item_id:
+            c["qty"] += 1
+            found = True
+
+    if not found:
+        cart.append({"id": item_id, "qty": 1})
+
+    session["cart"] = cart
+    return redirect(url_for("specials"))
+
+
+# ---------------- PLACE ORDER ----------------
+@app.route("/place_order")
 def place_order():
-    if "cart" not in session or len(session["cart"]) == 0:
-        return redirect(url_for("home"))
+    cart = session.get("cart", [])
+    if not cart:
+        flash("Cart is empty!")
+        return redirect(url_for("specials"))
 
     order_id = str(uuid.uuid4())
-    order_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    ORDERS_TABLE.put_item(
-        Item={
-            "order_id": order_id,
-            "items": session["cart"],
-            "order_date": order_date,
-            "status": "Order Placed"
-        }
-    )
+    orders_table.put_item(Item={
+        "order_id": order_id,
+        "user": session.get("user"),
+        "items": cart
+    })
 
     # SNS Notification
     sns.publish(
         TopicArn=SNS_TOPIC_ARN,
-        Subject="New Bakery Order 🍞",
-        Message=f"New order placed!\nOrder ID: {order_id}\nTime: {order_date}"
+        Message=f"New Order Placed!\nOrder ID: {order_id}\nUser: {session.get('user')}\nItems: {cart}",
+        Subject="New Bakery Order"
     )
 
-    session.pop("cart")
+    session["cart"] = []
+    flash("Order placed successfully!")
+    return redirect(url_for("specials"))
 
-    return render_template("success.html", order_id=order_id)
 
-# ---------- ADMIN: VIEW ORDERS ----------
-@app.route("/admin/orders")
-def admin_orders():
-    response = ORDERS_TABLE.scan()
-    orders = response.get("Items", [])
-    return render_template("orders.html", orders=orders)
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
-# ---------- RUN APP ----------
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+# ---------------- RUN ----------------
+if _name_ == "_main_":
+    app.run(debug=True)
+    
 
