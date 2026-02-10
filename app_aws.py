@@ -4,7 +4,7 @@ import uuid
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 
-app = Flask(_name_)
+app = Flask(__name___)
 app.secret_key = "artisan_secret_key"
 
 # ---------------- AWS CONFIGURATION ----------------
@@ -167,4 +167,5 @@ def logout():
 if _name_ == "_main_":
     app.run(debug=True)
     
+
 
